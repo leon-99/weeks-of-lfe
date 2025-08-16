@@ -1,55 +1,57 @@
 <template>
-  <div class="birthday-input">
-    <h2 class="input-title">Enter Your Birthday</h2>
-    <p class="input-description">
+  <div class="text-center p-8 bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 shadow-2xl">
+    <h2 class="text-4xl font-semibold mb-4 text-white">Enter Your Birthday</h2>
+    <p class="text-lg text-white/80 mb-10 leading-relaxed">
       Discover how many weeks you've lived and visualize your life journey
     </p>
     
-    <form @submit.prevent="handleSubmit" class="input-form">
-      <div class="input-group">
-        <label for="birthday" class="input-label">Date of Birth (DD/MM/YYYY)</label>
+    <form @submit.prevent="handleSubmit" class="mb-12">
+      <div class="mb-8">
+        <label for="birthday" class="block text-base font-medium text-white/90 mb-3 text-left">
+          Date of Birth (DD/MM/YYYY)
+        </label>
         <input
           id="birthday"
-          v-model="birthdayInput"
+          :value="birthdayInput"
           type="text"
-          class="input-glass birthday-field"
+          class="w-full text-lg px-5 py-4 text-center bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white outline-none transition-all duration-300 focus:border-white/40 focus:bg-white/15 focus:shadow-lg focus:shadow-white/10 placeholder-white/60"
           placeholder="DD/MM/YYYY"
           maxlength="10"
           required
           @input="formatDateInput"
         />
-        <div v-if="error" class="error-message">
+        <div v-if="error" class="text-red-300 text-sm mt-3 p-2 bg-red-500/10 rounded-lg border border-red-500/20">
           {{ error }}
         </div>
       </div>
       
       <button 
         type="submit" 
-        class="btn-glass submit-btn pulse-hover"
+        class="flex items-center justify-center gap-3 text-lg px-8 py-4 mx-auto min-w-[200px] bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-white font-medium transition-all duration-300 hover:bg-white/20 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:hover:bg-white/10 disabled:hover:shadow-none"
         :disabled="!birthdayInput"
       >
-        <span class="btn-text">Visualize My Life</span>
-        <span class="btn-icon">✨</span>
+        <span class="font-medium">Visualize My Life</span>
+        <span class="text-2xl">✨</span>
       </button>
     </form>
     
-    <div class="info-section">
-      <div class="info-item">
-        <div class="info-icon">📅</div>
-        <div class="info-text">
-          <strong>Life Expectancy:</strong> 75 years (3,900 weeks)
+    <div class="flex flex-col gap-6 mt-8">
+      <div class="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10 transition-all duration-300 hover:bg-white/8 hover:-translate-y-0.5">
+        <div class="text-2xl min-w-8 text-center">📅</div>
+        <div class="text-left text-white/90 leading-relaxed">
+          <strong class="text-white font-semibold">Life Expectancy:</strong> 75 years (3,900 weeks)
         </div>
       </div>
-      <div class="info-item">
-        <div class="info-icon">⏰</div>
-        <div class="info-text">
-          <strong>Each Square:</strong> Represents one week of your life
+      <div class="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10 transition-all duration-300 hover:bg-white/8 hover:-translate-y-0.5">
+        <div class="text-2xl min-w-8 text-center">⏰</div>
+        <div class="text-left text-white/90 leading-relaxed">
+          <strong class="text-white font-semibold">Each Square:</strong> Represents one week of your life
         </div>
       </div>
-      <div class="info-item">
-        <div class="info-icon">🎯</div>
-        <div class="info-text">
-          <strong>Perspective:</strong> See your time in a new light
+      <div class="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10 transition-all duration-300 hover:bg-white/8 hover:-translate-y-0.5">
+        <div class="text-2xl min-w-8 text-center">🎯</div>
+        <div class="text-left text-white/90 leading-relaxed">
+          <strong class="text-white font-semibold">Perspective:</strong> See your time in a new light
         </div>
       </div>
     </div>
@@ -58,6 +60,7 @@
 
 <script>
 import { ref } from 'vue'
+import { useLifeCalculations } from '../composables/useLifeCalculations'
 
 export default {
   name: 'BirthdayInput',
@@ -65,72 +68,24 @@ export default {
   setup(props, { emit }) {
     const birthdayInput = ref('')
     const error = ref('')
+    const { formatDateInput: formatInput, processBirthdayInput } = useLifeCalculations()
 
-    const formatDateInput = (event) => {
-      let value = event.target.value.replace(/\D/g, '') // Remove non-digits
+    const handleDateInput = (event) => {
+      const inputValue = event.target.value
       
-      if (value.length >= 2) {
-        value = value.substring(0, 2) + '/' + value.substring(2)
-      }
-      if (value.length >= 5) {
-        value = value.substring(0, 5) + '/' + value.substring(5, 9)
+      // Check if this is a deletion operation
+      const isDeleting = inputValue.length < birthdayInput.value.length
+      
+      if (isDeleting) {
+        // Allow deletion without formatting
+        birthdayInput.value = inputValue
+      } else {
+        // Apply formatting for additions
+        const formattedValue = formatInput(inputValue)
+        birthdayInput.value = formattedValue
       }
       
-      birthdayInput.value = value
       error.value = '' // Clear error when user types
-    }
-
-    const parseDateString = (dateStr) => {
-      // Parse DD/MM/YYYY format
-      const parts = dateStr.split('/')
-      if (parts.length !== 3) return null
-      
-      const day = parseInt(parts[0])
-      const month = parseInt(parts[1])
-      const year = parseInt(parts[2])
-      
-      // Basic validation
-      if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1900) {
-        return null
-      }
-      
-      // Create date object (month is 0-indexed in JavaScript)
-      const date = new Date(year, month - 1, day)
-      
-      // Check if the date is valid (handles leap years, etc.)
-      if (date.getDate() !== day || date.getMonth() !== month - 1 || date.getFullYear() !== year) {
-        return null
-      }
-      
-      return date
-    }
-
-    const validateBirthday = (dateStr) => {
-      if (!dateStr || dateStr.length !== 10) {
-        return 'Please enter a complete date (DD/MM/YYYY)'
-      }
-      
-      const birthDate = parseDateString(dateStr)
-      if (!birthDate) {
-        return 'Please enter a valid date (DD/MM/YYYY)'
-      }
-      
-      const today = new Date()
-      
-      if (birthDate > today) {
-        return 'Birthday cannot be in the future'
-      }
-      
-      const age = (today - birthDate) / (1000 * 60 * 60 * 24 * 365.25)
-      if (age > 120) {
-        return 'Please enter a realistic birthday'
-      }
-      
-      if (age < 0) {
-        return 'Please enter a valid birthday'
-      }
-      
-      return null
     }
 
     const handleSubmit = () => {
@@ -141,23 +96,19 @@ export default {
         return
       }
       
-      const validationError = validateBirthday(birthdayInput.value)
-      if (validationError) {
-        error.value = validationError
+      const result = processBirthdayInput(birthdayInput.value)
+      if (!result.success) {
+        error.value = result.error
         return
       }
       
-      // Convert to ISO format for the parent component
-      const birthDate = parseDateString(birthdayInput.value)
-      const isoString = birthDate.toISOString().split('T')[0]
-      
-      emit('birthday-selected', isoString)
+      emit('birthday-selected', result.isoDate)
     }
 
     return {
       birthdayInput,
       error,
-      formatDateInput,
+      formatDateInput: handleDateInput,
       handleSubmit
     }
   }
@@ -165,153 +116,133 @@ export default {
 </script>
 
 <style scoped>
-.birthday-input {
-  text-align: center;
-}
-
-.input-title {
-  font-size: 2.2rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: white;
-}
-
-.input-description {
-  font-size: 1.1rem;
-  color: rgba(255, 255, 255, 0.8);
-  margin-bottom: 2.5rem;
-  line-height: 1.6;
-}
-
-.input-form {
-  margin-bottom: 3rem;
-}
-
-.input-group {
-  margin-bottom: 2rem;
-}
-
-.input-label {
-  display: block;
-  font-size: 1rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 0.8rem;
-  text-align: left;
-}
-
-.birthday-field {
-  font-size: 1.1rem;
-  padding: 16px 20px;
-  text-align: center;
-}
-
-
-
-.error-message {
-  color: #fca5a5;
-  font-size: 0.9rem;
-  margin-top: 0.8rem;
-  padding: 0.5rem;
-  background: rgba(239, 68, 68, 0.1);
-  border-radius: 8px;
-  border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-.submit-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.8rem;
-  font-size: 1.1rem;
-  padding: 16px 32px;
-  margin: 0 auto;
-  min-width: 200px;
-  transition: all 0.3s ease;
-}
-
-.submit-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none !important;
-}
-
-.submit-btn:disabled:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: none;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-}
-
-.btn-text {
-  font-weight: 500;
-}
-
-.btn-icon {
-  font-size: 1.2rem;
-}
-
-.info-section {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  margin-top: 2rem;
-}
-
-.info-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s ease;
-}
-
-.info-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-2px);
-}
-
-.info-icon {
-  font-size: 1.5rem;
-  min-width: 2rem;
-  text-align: center;
-}
-
-.info-text {
-  text-align: left;
-  color: rgba(255, 255, 255, 0.9);
-  line-height: 1.5;
-}
-
-.info-text strong {
-  color: white;
-  font-weight: 600;
-}
-
+/* Mobile responsive adjustments */
 @media (max-width: 768px) {
-  .input-title {
+  .text-4xl {
     font-size: 1.8rem;
   }
   
-  .input-description {
+  .text-lg {
     font-size: 1rem;
   }
   
-  .submit-btn {
-    width: 100%;
-    min-width: auto;
+  .mb-10 {
+    margin-bottom: 2rem;
   }
   
-  .info-item {
-    flex-direction: column;
-    text-align: center;
+  .mb-12 {
+    margin-bottom: 2rem;
+  }
+  
+  .mb-8 {
+    margin-bottom: 1.5rem;
+  }
+  
+  .p-8 {
+    padding: 1.5rem;
+  }
+  
+  .gap-6 {
+    gap: 1rem;
+  }
+  
+  .mt-8 {
+    margin-top: 1.5rem;
+  }
+  
+  .min-w-\[200px\] {
+    min-width: auto;
+    width: 100%;
+  }
+  
+  .px-8 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  
+  .py-4 {
+    padding-top: 0.875rem;
+    padding-bottom: 0.875rem;
+  }
+  
+  .gap-4 {
+    gap: 0.75rem;
+  }
+  
+  .p-4 {
+    padding: 0.75rem;
+  }
+  
+  .text-2xl {
+    font-size: 1.5rem;
+  }
+  
+  .min-w-8 {
+    min-width: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .text-4xl {
+    font-size: 1.6rem;
+  }
+  
+  .text-lg {
+    font-size: 0.9rem;
+  }
+  
+  .mb-10 {
+    margin-bottom: 1.5rem;
+  }
+  
+  .mb-12 {
+    margin-bottom: 1.5rem;
+  }
+  
+  .mb-8 {
+    margin-bottom: 1rem;
+  }
+  
+  .p-8 {
+    padding: 1rem;
+  }
+  
+  .gap-6 {
+    gap: 0.75rem;
+  }
+  
+  .mt-8 {
+    margin-top: 1rem;
+  }
+  
+  .px-5 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .py-4 {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+  
+  .text-lg {
+    font-size: 1rem;
+  }
+  
+  .gap-4 {
     gap: 0.5rem;
   }
   
-  .info-text {
-    text-align: center;
+  .p-4 {
+    padding: 0.5rem;
+  }
+  
+  .text-2xl {
+    font-size: 1.3rem;
+  }
+  
+  .min-w-8 {
+    min-width: 1.5rem;
   }
 }
 </style>

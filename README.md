@@ -1,11 +1,11 @@
 # Life in Weeks
 
-A beautiful 3D visualization of your life journey, showing each week as an interactive cube in a stunning sea blue glass-themed interface.
+A beautiful visualization of your life journey, showing each week as an interactive cube in a stunning sea blue glass-themed interface.
 
 ## Features
 
 - 🎂 **Birthday Input**: Enter your birthday with validation
-- 📊 **3D Visualization**: Interactive Three.js visualization of your life weeks
+- 📊 **Life Visualization**: Interactive visualization of your life weeks
 - ✨ **Glass Theme**: Modern sea blue theme with glass morphism effects
 - 🎮 **Interactive**: Mouse controls, animations, and camera reset
 - 📱 **Responsive**: Works perfectly on desktop and mobile devices
@@ -14,7 +14,7 @@ A beautiful 3D visualization of your life journey, showing each week as an inter
 ## Tech Stack
 
 - **Vue 3** with Composition API
-- **Three.js** for 3D graphics and animations
+- **Vue.js** for reactive components and animations
 - **Vite** for build tooling
 - **CSS3** with glass morphism effects
 - **No TypeScript** (as requested)
@@ -60,7 +60,7 @@ npm run preview
 ## How It Works
 
 1. **Enter Your Birthday**: Input your date of birth using the date picker
-2. **View Your Life**: See your life visualized as a 3D grid of cubes
+2. **View Your Life**: See your life visualized as a grid of cubes
 3. **Interact**: 
    - Move your mouse to control the camera
    - Use "Reset View" to return to the default camera position
@@ -93,7 +93,7 @@ You can easily customize:
 - Safari
 - Edge
 
-Requires WebGL support for 3D visualization.
+Requires modern browser support for visualization.
 
 ## Performance
 

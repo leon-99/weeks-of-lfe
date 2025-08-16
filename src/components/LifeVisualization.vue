@@ -1,38 +1,62 @@
 <template>
-  <div class="life-visualization">
-    <div class="weeks-container">
-      <div class="weeks-grid">
-        <div 
-          v-for="week in totalWeeks" 
-          :key="week"
-          :class="[
-            'week-cube',
-            { 
-              'lived': week <= weeksLived,
-              'current-week': week === weeksLived,
-              'milestone': week % 260 === 0 && week > 0
-            }
-          ]"
-        >
+  <div class="w-full h-full flex flex-col gap-8">
+    <div class="overflow-auto max-h-[80vh] p-4 bg-white/5 rounded-3xl border border-white/10">
+      <!-- Mobile-optimized grid -->
+      <div class="md:hidden">
+        <div class="grid grid-cols-26 gap-0.5 p-4">
+          <div 
+            v-for="week in totalWeeks" 
+            :key="week"
+            :class="[
+              'w-3 h-3 rounded-sm transition-all duration-300',
+              { 
+                'bg-blue-500': week <= weeksLived && week !== weeksLived,
+                'bg-green-500': week === weeksLived,
+                'bg-yellow-500': week % 260 === 0 && week > 0 && week <= weeksLived,
+                'bg-slate-700/30': week > weeksLived
+              }
+            ]"
+          >
+          </div>
+        </div>
+      </div>
+      
+      <!-- Desktop grid -->
+      <div class="hidden md:block">
+        <div class="grid grid-cols-[repeat(52,12px)] gap-0.5 p-0">
+          <div 
+            v-for="week in totalWeeks" 
+            :key="week"
+            :class="[
+              'w-3 h-3 rounded-sm transition-all duration-300',
+              { 
+                'bg-blue-500': week <= weeksLived && week !== weeksLived,
+                'bg-green-500': week === weeksLived,
+                'bg-yellow-500': week % 260 === 0 && week > 0 && week <= weeksLived,
+                'bg-slate-700/30': week > weeksLived
+              }
+            ]"
+          >
+          </div>
         </div>
       </div>
     </div>
     
-    <div class="legend">
-      <div class="legend-item">
-        <div class="legend-cube lived"></div>
+    <div class="flex justify-center gap-8 p-6 flex-wrap mt-4 bg-white/5 rounded-2xl border border-white/10">
+      <div class="flex items-center gap-3 text-white/90 text-sm font-medium">
+        <div class="w-4 h-4 rounded-sm bg-blue-500 flex-shrink-0"></div>
         <span>Weeks Lived</span>
       </div>
-      <div class="legend-item">
-        <div class="legend-cube current"></div>
+      <div class="flex items-center gap-3 text-white/90 text-sm font-medium">
+        <div class="w-4 h-4 rounded-sm bg-green-500 flex-shrink-0"></div>
         <span>Current Week</span>
       </div>
-      <div class="legend-item">
-        <div class="legend-cube milestone"></div>
+      <div class="flex items-center gap-3 text-white/90 text-sm font-medium">
+        <div class="w-4 h-4 rounded-sm bg-yellow-500 flex-shrink-0"></div>
         <span>5-Year Milestones</span>
       </div>
-      <div class="legend-item">
-        <div class="legend-cube future"></div>
+      <div class="flex items-center gap-3 text-white/90 text-sm font-medium">
+        <div class="w-4 h-4 rounded-sm bg-slate-700/30 flex-shrink-0"></div>
         <span>Future Weeks</span>
       </div>
     </div>
@@ -51,169 +75,129 @@ export default {
 </script>
 
 <style scoped>
-.life-visualization {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.weeks-container {
-  overflow: auto;
-  max-height: 80vh;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Basic scrollbar styling */
-.weeks-container::-webkit-scrollbar {
+/* Custom scrollbar styling */
+.overflow-auto::-webkit-scrollbar {
   width: 8px;
 }
 
-.weeks-container::-webkit-scrollbar-track {
+.overflow-auto::-webkit-scrollbar-track {
   background: rgba(12, 74, 110, 0.2);
   border-radius: 4px;
 }
 
-.weeks-container::-webkit-scrollbar-thumb {
+.overflow-auto::-webkit-scrollbar-thumb {
   background: rgba(59, 130, 246, 0.6);
   border-radius: 4px;
 }
 
-.weeks-container::-webkit-scrollbar-thumb:hover {
+.overflow-auto::-webkit-scrollbar-thumb:hover {
   background: rgba(59, 130, 246, 0.8);
 }
 
-.weeks-grid {
-  display: grid;
-  grid-template-columns: repeat(52, 12px);
-  gap: 2px;
-  padding: 0;
-}
-
-.week-cube {
-  width: 12px;
-  height: 12px;
-  border-radius: 2px;
-}
-
-.week-cube.lived {
-  background: #3b82f6;
-}
-
-.week-cube.current-week {
-  background: #10b981;
-}
-
-.week-cube.milestone {
-  background: #f59e0b;
-}
-
-.week-cube:not(.lived) {
-  background: rgba(30, 58, 138, 0.3);
-}
-
-.legend {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  padding: 1.5rem;
-  flex-wrap: wrap;
-  margin-top: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  color: white;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.legend-cube {
-  width: 16px;
-  height: 16px;
-  border-radius: 3px;
-  flex-shrink: 0;
-}
-
-.legend-cube.lived {
-  background: #3b82f6;
-}
-
-.legend-cube.current {
-  background: #10b981;
-}
-
-.legend-cube.milestone {
-  background: #f59e0b;
-}
-
-.legend-cube.future {
-  background: rgba(30, 58, 138, 0.3);
-}
-
+/* Mobile responsive adjustments */
 @media (max-width: 768px) {
-  .weeks-grid {
-    grid-template-columns: repeat(52, 6px);
-    gap: 1px;
-    padding: 0.5rem;
+  .max-h-\[80vh\] {
+    max-height: 60vh;
   }
   
-  .week-cube {
-    width: 6px;
-    height: 6px;
+  .p-4 {
+    padding: 0.75rem;
   }
   
-  .legend {
+  .rounded-3xl {
+    border-radius: 1rem;
+  }
+  
+  .gap-8 {
     gap: 1rem;
+  }
+  
+  .p-6 {
     padding: 1rem;
   }
   
-  .legend-item {
-    font-size: 0.8rem;
+  .mt-4 {
+    margin-top: 0.75rem;
+  }
+  
+  .gap-3 {
     gap: 0.5rem;
   }
   
-  .legend-cube {
-    width: 12px;
-    height: 12px;
+  .text-sm {
+    font-size: 0.8rem;
+  }
+  
+  /* Mobile grid specific adjustments */
+  .grid-cols-26 {
+    grid-template-columns: repeat(26, minmax(0, 1fr));
+  }
+  
+  .gap-0\.5 {
+    gap: 2px;
+  }
+  
+  .w-3 {
+    width: 0.75rem;
+    height: 0.75rem;
   }
 }
 
 @media (max-width: 480px) {
-  .weeks-grid {
-    grid-template-columns: repeat(52, 4px);
-    gap: 1px;
-    padding: 0.25rem;
+  .max-h-\[80vh\] {
+    max-height: 50vh;
   }
   
-  .week-cube {
-    width: 4px;
-    height: 4px;
-  }
-  
-  .legend {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.8rem;
+  .p-4 {
     padding: 0.5rem;
   }
   
-  .legend-item {
+  .rounded-3xl {
+    border-radius: 0.75rem;
+  }
+  
+  .gap-8 {
+    gap: 0.75rem;
+  }
+  
+  .p-6 {
+    padding: 0.5rem;
+  }
+  
+  .mt-4 {
+    margin-top: 0.5rem;
+  }
+  
+  .gap-3 {
+    gap: 0.4rem;
+  }
+  
+  .text-sm {
     font-size: 0.7rem;
   }
   
-  .legend-cube {
-    width: 8px;
-    height: 8px;
+  /* Extra small screen grid adjustments */
+  .grid-cols-26 {
+    grid-template-columns: repeat(26, minmax(0, 1fr));
+  }
+  
+  .gap-0\.5 {
+    gap: 1px;
+  }
+  
+  .w-3 {
+    width: 0.6rem;
+    height: 0.6rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .max-h-\[80vh\] {
+    max-height: 70vh;
+  }
+  
+  .p-4 {
+    padding: 1rem;
   }
 }
 </style>
